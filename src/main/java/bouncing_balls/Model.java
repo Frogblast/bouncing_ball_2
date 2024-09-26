@@ -27,9 +27,9 @@ class Model {
 		balls = new Ball[3];
 
 		// 2D
-		balls[0] = new Ball(width / 3, height * 0.5, 1.2, 0, 0.2, Color.BLUE);
-		balls[1] = new Ball(2 * width / 3, height * 0.3, -1, 0, 0.3, Color.RED);
-		balls[2] = new Ball(1.5 * width / 3, height * 0.2, -2, 0, 0.1, Color.GREEN);
+		balls[0] = new Ball(width / 3, height * 0.5, 1.2, 0, 0.35, Color.BLUE);
+		balls[1] = new Ball(2 * width / 3, height * 0.3, -1, 0, 0.20, Color.RED);
+		balls[2] = new Ball(1.5 * width / 3, height * 0.2, -2, 0, 0.15, Color.GREEN);
 
 
 		// 1D
@@ -87,8 +87,8 @@ class Model {
 	}
 
 	protected static void transferMomentum2D(Ball b1, Ball b2) {
-		double m1 = b1.radius; // mass is proportional to radius
-		double m2 = b2.radius;
+		double m1 = b1.radius * b1.radius; // mass is proportional to radius (squared in 2d, cubed if 3d)
+		double m2 = b2.radius * b2.radius;
 		double uX1 = b1.vx;
 		double uY1 = b1.vy;
 		double uX2 = b2.vx;
