@@ -27,9 +27,9 @@ class Model {
 		balls = new Ball[3];
 		// 2D
 
-		balls[0] = new Ball(width / 3, height * 0.9, 1.2, 1.6, 0.2, Color.BLUE);
-		balls[1] = new Ball(2 * width / 3, height * 0.7, -1, 3, 0.3, Color.RED);
-		balls[2] = new Ball(1.5 * width / 3, height * 0.8, -2, -2, 0.1, Color.GREEN);
+		balls[0] = new Ball(width / 3, height * 0.5, 1.2, 0, 0.2, Color.BLUE);
+		balls[1] = new Ball(2 * width / 3, height * 0.3, -1, 0, 0.3, Color.RED);
+		balls[2] = new Ball(1.5 * width / 3, height * 0.2, -2, 0, 0.1, Color.GREEN);
 	//	balls[3] = new Ball(2.5 * width / 3, height * 0.2, -1, 1, 0.3, Color.RED);
 
 
@@ -41,7 +41,7 @@ class Model {
 
 	void step(double deltaT) {
 		// TODO this method implements one step of simulation with a step deltaT
-		float g = 0; // -9.82f; // acceleration of gravity
+		float g = -9.82f; // acceleration of gravity
 		double collisionMargin = 0.01; // to avoid overlapping
 
 		for (Ball b : balls) {
