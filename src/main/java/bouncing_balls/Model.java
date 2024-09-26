@@ -25,12 +25,11 @@ class Model {
 
 		// Initialize the model with a few balls
 		balls = new Ball[3];
-		// 2D
 
+		// 2D
 		balls[0] = new Ball(width / 3, height * 0.5, 1.2, 0, 0.2, Color.BLUE);
 		balls[1] = new Ball(2 * width / 3, height * 0.3, -1, 0, 0.3, Color.RED);
 		balls[2] = new Ball(1.5 * width / 3, height * 0.2, -2, 0, 0.1, Color.GREEN);
-	//	balls[3] = new Ball(2.5 * width / 3, height * 0.2, -1, 1, 0.3, Color.RED);
 
 
 		// 1D
@@ -108,7 +107,7 @@ class Model {
 		double u2 = uX2*cX + uY2*cY;
 
 		// Project u1 and u2 on tangent line (remove this part since it should be unchanged)
-		double cYtangent = cX;
+		double cYtangent = cX; // rotate90(x,y) = (-y,x)
 		double cXtangent = -cY;
 		double u1tangent = uX1*cXtangent + uY1*cYtangent;
 		double u2tangent = uX2*cXtangent + uY2*cYtangent;
@@ -175,7 +174,5 @@ class Model {
 		 * Position, speed, and radius of the ball. You may wish to add other attributes.
 		 */
 		double x, y, vx, vy, radius;
-
-
 	}
 }
