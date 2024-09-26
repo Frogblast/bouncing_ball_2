@@ -98,10 +98,10 @@ class Model {
 		// find the direction of collision
 		double cDeltaX = b2.x - b1.x;
 		double cDeltaY = b2.y - b1.y;
-		double cMagnitude = Math.sqrt(Math.pow(cDeltaX,2) + Math.pow(cDeltaY,2)); // pythogoras thm
+		double cMagnitude = Math.sqrt(Math.pow(cDeltaX,2) + Math.pow(cDeltaY,2)); // skipped rectToPolar
 		double cX = cDeltaX/cMagnitude; // normalized
 		double cY = cDeltaY/cMagnitude;
-		double angle = Math.atan2(cY, cX);
+		double angle = Math.atan2(cY, cX); // skipped rectToPolar
 
 		// Project u1 and u2 on collision line
 		double u1 = uX1*cX + uY1*cY;
@@ -117,12 +117,16 @@ class Model {
 		double v1 = (m1*u1 + 2*m2*u2 -m2*u1)/(m1 + m2);
 		double v2 = (2*m1*u1 + m2*u2 - m1*u2)/(m1 + m2);
 
+		// decompose v1 and v2 into rectangular form to get the vx and vy components
+		double[] v1_decomposed = polarToRect(v1, angle);
+		double[] v2_decomposed = polarToRect(v2, angle);
+
 		// Break out the respective components of v1 and v2
 		// Add the unchanged component
-		b1.vx = v1 * Math.cos(angle) + u1tangent*cXtangent;
-		b1.vy = v1 * Math.sin(angle) + u1tangent*cYtangent;
-		b2.vx = v2 * Math.cos(angle) + u2tangent*cXtangent;
-		b2.vy = v2 * Math.sin(angle) + u2tangent*cYtangent;
+		b1.vx = v1_decomposed[0] + u1tangent*cXtangent;
+		b1.vy = v1_decomposed[1] + u1tangent*cYtangent;
+		b2.vx = v2_decomposed[0] + u2tangent*cXtangent;
+		b2.vy = v2_decomposed[1] + u2tangent*cYtangent;
 	}
 
 	// Only for testing
