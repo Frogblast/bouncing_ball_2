@@ -88,31 +88,41 @@ class Model {
 	}
 
 	protected static void transferMomentum2D(Ball b1, Ball b2) {
-		double m1 = b1.radius;
+		double m1 = b1.radius; // mass is proportional to radius
 		double m2 = b2.radius;
 		double uX1 = b1.vx;
 		double uY1 = b1.vy;
 		double uX2 = b2.vx;
 		double uY2 = b2.vy;
 
-		// direction of collision
+		// find the direction of collision
 		double cDeltaX = b2.x - b1.x;
 		double cDeltaY = b2.y - b1.y;
-		double cMagnitude = Math.sqrt(Math.pow(cDeltaX,2) + Math.pow(cDeltaY,2));
-		double cX = cDeltaX/cMagnitude;
+		double cMagnitude = Math.sqrt(Math.pow(cDeltaX,2) + Math.pow(cDeltaY,2)); // pythogoras thm
+		double cX = cDeltaX/cMagnitude; // normalized
 		double cY = cDeltaY/cMagnitude;
 		double angle = Math.atan2(cY, cX);
 
-		// Project u1 on collision line
-		double U1 = uX1*cX + uY1*cY;
-		double U2 = uX2*cX + uY2*cY;
-		double V1 = (m1*U1 + 2*m2*U2 -m2*U1)/(m1 + m2);
-		double V2 = (2*m1*U1 + m2*U2 - m1*U2)/(m1 + m2);
+		// Project u1 and u2 on collision line
+		double u1 = uX1*cX + uY1*cY;
+		double u2 = uX2*cX + uY2*cY;
 
-		b1.vx = V1 * Math.cos(angle);
-		b1.vy = V1 * Math.sin(angle);
-		b2.vx = V2 * Math.cos(angle);
-		b2.vy = V2 * Math.sin(angle);
+		// Project u1 and u2 on tangent line (remove this part since it should be unchanged)
+		double cYtangent = cX;
+		double cXtangent = -cY;
+		double u1tangent = uX1*cXtangent + uY1*cYtangent;
+		double u2tangent = uX2*cXtangent + uY2*cYtangent;
+
+		// Solve for v1 and v2 in the system of equations
+		double v1 = (m1*u1 + 2*m2*u2 -m2*u1)/(m1 + m2);
+		double v2 = (2*m1*u1 + m2*u2 - m1*u2)/(m1 + m2);
+
+		// Break out the respective components of v1 and v2
+		// Add the unchanged component
+		b1.vx = v1 * Math.cos(angle) + u1tangent*cXtangent;
+		b1.vy = v1 * Math.sin(angle) + u1tangent*cYtangent;
+		b2.vx = v2 * Math.cos(angle) + u2tangent*cXtangent;
+		b2.vy = v2 * Math.sin(angle) + u2tangent*cYtangent;
 	}
 
 	// Only for testing
