@@ -2,7 +2,6 @@ package bouncing_balls;
 
 
 import java.awt.*;
-import java.util.Random;
 
 /**
  * The physics model.
@@ -25,16 +24,19 @@ class Model {
 		areaHeight = height;
 
 		// Initialize the model with a few balls
-		balls = new Ball[2];
+		balls = new Ball[3];
 		// 2D
-/*
+
 		balls[0] = new Ball(width / 3, height * 0.9, 1.2, 1.6, 0.2, Color.BLUE);
-		balls[1] = new Ball(2 * width / 3, height * 0.7, -0.6, 0.6, 0.3, Color.RED);
-*/
+		balls[1] = new Ball(2 * width / 3, height * 0.7, -1, 3, 0.3, Color.RED);
+		balls[2] = new Ball(1.5 * width / 3, height * 0.8, -2, -2, 0.1, Color.GREEN);
+	//	balls[3] = new Ball(2.5 * width / 3, height * 0.2, -1, 1, 0.3, Color.RED);
+
 
 		// 1D
-		balls[0] = new Ball(width / 3, height * 0.2, 2, 0, 0.2, Color.BLUE);
-		balls[1] = new Ball(2 * width / 3, height * 0.2, -1, 0, 0.3, Color.RED);
+/*		balls[0] = new Ball(width / 3, height * 0.2, 2, 0, 0.2, Color.BLUE);
+		balls[1] = new Ball(2 * width / 3, height * 0.2, -1, 0, 0.3, Color.RED);*/
+
 	}
 
 	void step(double deltaT) {
@@ -77,6 +79,7 @@ class Model {
 			if (b.collisionTimer > collisionTimer*2){
 				double distanceSquared = Math.pow((b2.x - b.x),2) + Math.pow((b2.y - b.y), 2);
 				if (distanceSquared <= Math.pow(b.radius + b2.radius, 2) + collisionMargin){
+					//transferMomentum1D(b, b2);
 					transferMomentum2D(b, b2);
 					b.collisionTimer = 0;
 				}
@@ -85,6 +88,35 @@ class Model {
 	}
 
 	protected static void transferMomentum2D(Ball b1, Ball b2) {
+		double m1 = b1.radius;
+		double m2 = b2.radius;
+		double uX1 = b1.vx;
+		double uY1 = b1.vy;
+		double uX2 = b2.vx;
+		double uY2 = b2.vy;
+
+		// direction of collision
+		double cDeltaX = b2.x - b1.x;
+		double cDeltaY = b2.y - b1.y;
+		double cMagnitude = Math.sqrt(Math.pow(cDeltaX,2) + Math.pow(cDeltaY,2));
+		double cX = cDeltaX/cMagnitude;
+		double cY = cDeltaY/cMagnitude;
+		double angle = Math.atan2(cY, cX);
+
+		// Project u1 on collision line
+		double U1 = uX1*cX + uY1*cY;
+		double U2 = uX2*cX + uY2*cY;
+		double V1 = (m1*U1 + 2*m2*U2 -m2*U1)/(m1 + m2);
+		double V2 = (2*m1*U1 + m2*U2 - m1*U2)/(m1 + m2);
+
+		b1.vx = V1 * Math.cos(angle);
+		b1.vy = V1 * Math.sin(angle);
+		b2.vx = V2 * Math.cos(angle);
+		b2.vy = V2 * Math.sin(angle);
+	}
+
+	// Only for testing
+	protected static void transferMomentum1D(Ball b1, Ball b2) {
 		double m1 = b1.radius;
 		double m2 = b2.radius;
 		double u1 = b1.vx;

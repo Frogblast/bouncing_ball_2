@@ -1,6 +1,5 @@
 package bouncing_balls;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.awt.*;
@@ -27,7 +26,7 @@ class ModelTest {
         b1 = new Model.Ball(100, 0, -2, 0, 0.2, Color.BLUE);
         b2 = new Model.Ball(100, 0, 3, 0, 0.2, Color.RED);
 
-        transferMomentum2D(b1, b2);
+        transferMomentum1D(b1, b2);
         assertEquals(3, b1.vx, 0.001);
         assertEquals(-2, b2.vx, 0.001);
     }
@@ -38,7 +37,7 @@ class ModelTest {
         b1 = new Model.Ball(100, 0, 0, 0, 0.2, Color.BLUE);
         b2 = new Model.Ball(100, 0, 1, 0, 0.2, Color.RED);
 
-        transferMomentum2D(b1, b2);
+        transferMomentum1D(b1, b2);
         assertEquals(1.666, b1.vx, 0.001);
         assertEquals(3.333, b2.vx, 0.001);
     }
