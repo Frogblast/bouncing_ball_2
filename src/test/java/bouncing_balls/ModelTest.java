@@ -1,16 +1,47 @@
 package bouncing_balls;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static bouncing_balls.Model.polarToRect;
-import static bouncing_balls.Model.rectToPolar;
+import java.awt.*;
+
+import static bouncing_balls.Model.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 class ModelTest {
 
     final double EPSILON = 1e-9;
 
+    Model.Ball b1;
+    Model.Ball b2;
 
+/*    @BeforeEach
+    void setUp() {
+        // Initialize balls before each test
+        b1 = new Model.Ball(100, 0, -2, 0, 0.2, Color.BLUE);
+        b2 = new Model.Ball(100, 0, 3, 0, 0.2, Color.RED);
+    }*/
+
+    @Test
+    void testEqualMassesOppositeVelocities() {
+        b1 = new Model.Ball(100, 0, -2, 0, 0.2, Color.BLUE);
+        b2 = new Model.Ball(100, 0, 3, 0, 0.2, Color.RED);
+
+        transferMomentum2D(b1, b2);
+        assertEquals(3, b1.vx, 0.001);
+        assertEquals(-2, b2.vx, 0.001);
+    }
+
+    @Test
+    void testStationarySecondBall() {
+        // Reinitialize b2 to be stationary
+        b1 = new Model.Ball(100, 0, 0, 0, 0.2, Color.BLUE);
+        b2 = new Model.Ball(100, 0, 1, 0, 0.2, Color.RED);
+
+        transferMomentum2D(b1, b2);
+        assertEquals(1.666, b1.vx, 0.001);
+        assertEquals(3.333, b2.vx, 0.001);
+    }
 
 
     @Test

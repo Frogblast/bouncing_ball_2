@@ -33,13 +33,13 @@ class Model {
 */
 
 		// 1D
-		balls[0] = new Ball(width / 3, height * 0, 2, 0, 0.2, Color.BLUE);
-		balls[1] = new Ball(2 * width / 3, height * 0, -1, 0, 0.3, Color.RED);
+		balls[0] = new Ball(width / 3, height * 0.2, 2, 0, 0.2, Color.BLUE);
+		balls[1] = new Ball(2 * width / 3, height * 0.2, -1, 0, 0.3, Color.RED);
 	}
 
 	void step(double deltaT) {
 		// TODO this method implements one step of simulation with a step deltaT
-		float g = -9.8f; // acceleration of gravity
+		float g = 0; // -9.82f; // acceleration of gravity
 		double collisionMargin = 0.01; // to avoid overlapping
 
 		for (Ball b : balls) {
@@ -84,7 +84,7 @@ class Model {
 		}
 	}
 
-	protected void transferMomentum2D(Ball b1, Ball b2) {
+	protected static void transferMomentum2D(Ball b1, Ball b2) {
 		double m1 = b1.radius;
 		double m2 = b2.radius;
 		double u1 = b1.vx;
@@ -109,7 +109,7 @@ class Model {
 	/**
 	 * Simple inner class describing balls.
 	 */
-	class Ball {
+	public static class Ball {
 		/*Collision timer increases with deltaT on each step. If this number is above a certain threshold
 		 * the collision will register and this timer will be set to 0. An ugly bug fix...
 		 * */
