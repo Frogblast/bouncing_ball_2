@@ -22,6 +22,42 @@ class ModelTest {
     }*/
 
     @Test
+    void test_calculateKineticEnergy(){
+        b1 = new Model.Ball(100, 0, -1, 2, 1, Color.BLUE);
+        double e = calculateKineticEnergy(b1);
+        assertEquals(1.118033989, e, EPSILON);
+    }
+
+    @Test
+    void testAdjustOverlap_b2right_b1left(){
+        b1 = new Model.Ball(100, 0, 0, 0, 1, Color.BLUE);
+        b2 = new Model.Ball(101, 0, 0, 0, 1, Color.RED);
+
+        adjustOverlap(b1,b2);
+        assertEquals(101.5, b1.x);
+        assertEquals(99.5, b2.x);
+    }
+
+    @Test
+    void testAdjustOverlap_b1right_b2left(){
+        b1 = new Model.Ball(101, 0, 0, 0, 1, Color.BLUE);
+        b2 = new Model.Ball(100, 0, 0, 0, 1, Color.RED);
+
+        adjustOverlap(b1,b2);
+        assertEquals(101.5, b1.x);
+        assertEquals(99.5, b2.x);
+    }
+    @Test
+    void testAdjustOverlap_b1below_b2above(){
+        b1 = new Model.Ball(0, 100, 0, 0, 1, Color.BLUE);
+        b2 = new Model.Ball(0, 101, 0, 0, 1, Color.RED);
+
+        adjustOverlap(b1,b2);
+        assertEquals(99.5, b1.y);
+        assertEquals(101.5, b2.y);
+    }
+
+    @Test
     void testEqualMassesOppositeVelocities() {
         b1 = new Model.Ball(100, 0, -2, 0, 0.2, Color.BLUE);
         b2 = new Model.Ball(100, 0, 3, 0, 0.2, Color.RED);

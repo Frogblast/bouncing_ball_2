@@ -17,6 +17,8 @@ class Model {
 
 	double areaWidth, areaHeight;
 
+	double totalKineticEnergy;
+
 	Ball [] balls;
 
 	Model(double width, double height) {
@@ -27,21 +29,24 @@ class Model {
 		balls = new Ball[3];
 
 		// 2D
-		balls[0] = new Ball(width / 3, height * 0.5, 1.2, 0, 0.35, Color.BLUE);
-		balls[1] = new Ball(2 * width / 3, height * 0.3, -1, 0, 0.20, Color.RED);
-		balls[2] = new Ball(1.5 * width / 3, height * 0.2, -2, 0, 0.15, Color.GREEN);
+		balls[0] = new Ball(width / 2, height * 0.5, .5, 0, 0.35, Color.BLUE);
+		balls[1] = new Ball(2 * width / 3, height * 0.3, -.5, 0, 0.3, Color.RED);
+		balls[2] = new Ball(1.5 * width / 3, height * 0.2, .5, 0, 0.2, Color.GREEN);
 
-
-		// 1D
-/*		balls[0] = new Ball(width / 3, height * 0.2, 2, 0, 0.2, Color.BLUE);
-		balls[1] = new Ball(2 * width / 3, height * 0.2, -1, 0, 0.3, Color.RED);*/
-
+		for (Ball b : balls){
+			totalKineticEnergy += calculateKineticEnergy(b);
+		}
+		System.out.println("Initial kinetic energy: " + totalKineticEnergy);
 	}
+
+
 
 	void step(double deltaT) {
 		// TODO this method implements one step of simulation with a step deltaT
 		float g = -9.82f; // acceleration of gravity
 		double collisionMargin = 0.01; // to avoid overlapping
+
+		double actualKineticEnergy = 0;
 
 		for (Ball b : balls) {
 
@@ -64,6 +69,40 @@ class Model {
 
 			// handle collisions with the other ball(s?)
 			handleTwoBallsColliding(b, collisionMargin, deltaT);
+
+			// reposition balls if they are stuck
+			handleBallsBeingStuck(b);
+
+			// update actual kinetik energy
+			actualKineticEnergy += calculateKineticEnergy(b);
+		}
+
+		if (actualKineticEnergy > totalKineticEnergy + 0.5){
+			System.out.println("energy not conserved");
+			double amountGenerated = actualKineticEnergy - totalKineticEnergy;
+			double averageIncrease = amountGenerated/balls.length;
+			for (Ball b : balls){
+				if (b.vy > 0) b.vy-= averageIncrease;
+				else if (b.vy < 0) b.vy+= averageIncrease;
+			}
+		}
+	}
+	protected static double calculateKineticEnergy(Ball b){
+		return (double) 1/2*(b.radius*b.radius * Math.sqrt(b.vx*b.vx + b.vy * b.vy));
+	}
+
+	private void handleBallsBeingStuck(Ball b){
+		if (b.x - b.radius < 0){
+			b.x = 0 + b.radius;
+		}
+		if (b.y + b.radius > areaHeight){
+			b.y = areaHeight - b.radius;
+		}
+		if (b.x + b.radius > areaWidth){
+			b.x = areaWidth - b.radius;
+		}
+		if (b.y - b.radius < 0){
+			b.y = 0 + b.radius;
 		}
 	}
 
@@ -75,14 +114,29 @@ class Model {
 			// of the right triangle where distance between x coordinates is the first leg
 			// and the distance between y coordinates is the second leg.
 			// the hypotenuse and the sum of radii are both squared in order to not having to take the costly square root...
-			if (b.collisionTimer > collisionTimer*2){
+			if (b.collisionTimer > collisionTimer*5){
 				double distanceSquared = Math.pow((b2.x - b.x),2) + Math.pow((b2.y - b.y), 2);
 				if (distanceSquared <= Math.pow(b.radius + b2.radius, 2) + collisionMargin){
+					//adjustOverlap(b, b2);
 					//transferMomentum1D(b, b2);
 					transferMomentum2D(b, b2);
 					b.collisionTimer = 0;
 				}
 			}
+		}
+	}
+
+	protected static void adjustOverlap(Ball b1, Ball b2) {
+		double difX = ((b2.x + b2.radius) - (b1.x - b1.radius));
+		double difY = ((b2.y - b2.radius) - (b1.y + b1.radius));
+
+		if (difX > 0){
+			b1.x = b1.x + difX / 2;
+			b2.x = b2.x - difX / 2;
+		}
+		if (difY > 0){
+			b1.y = b1.y - difY / 2;
+			b2.y = b2.y + difY / 2;
 		}
 	}
 
@@ -169,6 +223,8 @@ class Model {
 			this.radius = r;
 			this.color = c;
 		}
+
+
 
 		/**
 		 * Position, speed, and radius of the ball. You may wish to add other attributes.
