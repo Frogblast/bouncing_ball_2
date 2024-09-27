@@ -33,6 +33,10 @@ class Model {
 		balls[1] = new Ball(2 * width / 3, height * 0.3, -.5, 0, 0.3, Color.RED);
 		balls[2] = new Ball(1.5 * width / 3, height * 0.2, .5, 0, 0.2, Color.GREEN);
 
+/*		balls[3] = new Ball(0.5*width / 2, height * 0.5, .5, 0, 0.1, Color.GRAY);
+		balls[4] = new Ball(1 * width / 3, height * 0.3, -.5, 0, 0.12, Color.ORANGE);
+		balls[5] = new Ball(2.5 * width / 3, height * 0.2, .5, 0, 0.15, Color.MAGENTA);*/
+
 		for (Ball b : balls){
 			totalKineticEnergy += calculateKineticEnergy(b);
 		}
@@ -47,6 +51,7 @@ class Model {
 		double collisionMargin = 0.01; // to avoid overlapping
 
 		double actualKineticEnergy = 0;
+		Ball highestKineticBall = balls[0];
 
 		for (Ball b : balls) {
 
@@ -74,17 +79,23 @@ class Model {
 			handleBallsBeingStuck(b);
 
 			// update actual kinetik energy
-			actualKineticEnergy += calculateKineticEnergy(b);
+			double energy = calculateKineticEnergy(b);
+			actualKineticEnergy += energy;
+			if (energy > calculateKineticEnergy(highestKineticBall)){
+				highestKineticBall = b;
+			}
 		}
 
 		if (actualKineticEnergy > totalKineticEnergy + 0.5){
 			System.out.println("energy not conserved");
 			double amountGenerated = actualKineticEnergy - totalKineticEnergy;
-			double averageIncrease = amountGenerated/balls.length;
+			if (highestKineticBall.vy < 0) highestKineticBall.vy += amountGenerated;
+			if (highestKineticBall.vy > 0) highestKineticBall.vy -= amountGenerated;
+			/*double averageIncrease = amountGenerated/balls.length;
 			for (Ball b : balls){
 				if (b.vy > 0) b.vy-= averageIncrease;
 				else if (b.vy < 0) b.vy+= averageIncrease;
-			}
+			}*/
 		}
 	}
 	protected static double calculateKineticEnergy(Ball b){
@@ -114,7 +125,7 @@ class Model {
 			// of the right triangle where distance between x coordinates is the first leg
 			// and the distance between y coordinates is the second leg.
 			// the hypotenuse and the sum of radii are both squared in order to not having to take the costly square root...
-			if (b.collisionTimer > collisionTimer*5){
+			if (b.collisionTimer > collisionTimer * 6){ // collision once every 5 steps
 				double distanceSquared = Math.pow((b2.x - b.x),2) + Math.pow((b2.y - b.y), 2);
 				if (distanceSquared <= Math.pow(b.radius + b2.radius, 2) + collisionMargin){
 					//adjustOverlap(b, b2);

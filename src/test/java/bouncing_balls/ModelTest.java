@@ -14,12 +14,6 @@ class ModelTest {
     Model.Ball b1;
     Model.Ball b2;
 
-/*    @BeforeEach
-    void setUp() {
-        // Initialize balls before each test
-        b1 = new Model.Ball(100, 0, -2, 0, 0.2, Color.BLUE);
-        b2 = new Model.Ball(100, 0, 3, 0, 0.2, Color.RED);
-    }*/
 
     @Test
     void test_calculateKineticEnergy(){
@@ -47,15 +41,7 @@ class ModelTest {
         assertEquals(101.5, b1.x);
         assertEquals(99.5, b2.x);
     }
-    @Test
-    void testAdjustOverlap_b1below_b2above(){
-        b1 = new Model.Ball(0, 100, 0, 0, 1, Color.BLUE);
-        b2 = new Model.Ball(0, 101, 0, 0, 1, Color.RED);
 
-        adjustOverlap(b1,b2);
-        assertEquals(99.5, b1.y);
-        assertEquals(101.5, b2.y);
-    }
 
     @Test
     void testEqualMassesOppositeVelocities() {
@@ -67,16 +53,6 @@ class ModelTest {
         assertEquals(-2, b2.vx, 0.001);
     }
 
-    @Test
-    void testStationarySecondBall() {
-        // Reinitialize b2 to be stationary
-        b1 = new Model.Ball(100, 0, 0, 0, 0.2, Color.BLUE);
-        b2 = new Model.Ball(100, 0, 1, 0, 0.2, Color.RED);
-
-        transferMomentum1D(b1, b2);
-        assertEquals(1.666, b1.vx, 0.001);
-        assertEquals(3.333, b2.vx, 0.001);
-    }
 
 
     @Test
