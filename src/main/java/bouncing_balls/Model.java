@@ -17,6 +17,7 @@ class Model {
 
 	double areaWidth, areaHeight;
 
+	// Used to check if the total kinetic energy of the system is unchanged after each step
 	double totalKineticEnergy;
 
 	Ball [] balls;
@@ -29,14 +30,11 @@ class Model {
 		balls = new Ball[3];
 
 		// 2D
-		balls[0] = new Ball(width / 2, height * 0.5, .5, 0, 0.35, Color.BLUE);
+		balls[0] = new Ball(1 * width / 3, height * 0.5, .5, 0, 0.35, Color.BLUE);
 		balls[1] = new Ball(2 * width / 3, height * 0.3, -.5, 0, 0.3, Color.RED);
-		balls[2] = new Ball(1.5 * width / 3, height * 0.2, .5, 0, 0.2, Color.GREEN);
+		balls[2] = new Ball(1.5 * width / 3, height * 0.7, .5, 0, 0.2, Color.GREEN);
 
-/*		balls[3] = new Ball(0.5*width / 2, height * 0.5, .5, 0, 0.1, Color.GRAY);
-		balls[4] = new Ball(1 * width / 3, height * 0.3, -.5, 0, 0.12, Color.ORANGE);
-		balls[5] = new Ball(2.5 * width / 3, height * 0.2, .5, 0, 0.15, Color.MAGENTA);*/
-
+		// Calculate the system's total kinetic energy
 		for (Ball b : balls){
 			totalKineticEnergy += calculateKineticEnergy(b);
 		}
@@ -51,11 +49,10 @@ class Model {
 		double collisionMargin = 0.01; // to avoid overlapping
 
 		double actualKineticEnergy = 0;
-		Ball highestKineticBall = balls[0];
 
 		for (Ball b : balls) {
 
-			b.collisionTimer += deltaT;
+			b.collisionTimer += deltaT; // Ensure the balls don't make multiple collisions in too short intervals
 
 			// detect collision with the border
 			if (b.x - collisionMargin < b.radius || b.x + collisionMargin > areaWidth - b.radius) {
@@ -75,47 +72,25 @@ class Model {
 			// handle collisions with the other ball(s?)
 			handleTwoBallsColliding(b, collisionMargin, deltaT);
 
-			// reposition balls if they are stuck
-			handleBallsBeingStuck(b);
+			// reposition balls if they go over the edges
+			handleBallsBeingStuckOnEdges(b);
 
 			// update actual kinetik energy
 			double energy = calculateKineticEnergy(b);
-			actualKineticEnergy += energy;
-			if (energy > calculateKineticEnergy(highestKineticBall)){
-				highestKineticBall = b;
-			}
+				actualKineticEnergy += energy;
 		}
 
+		// Fix a bug when new kinetic energy is generated over time
 		if (actualKineticEnergy > totalKineticEnergy + 0.5){
 			System.out.println("energy not conserved");
-			double amountGenerated = actualKineticEnergy - totalKineticEnergy;
-			if (highestKineticBall.vy < 0) highestKineticBall.vy += amountGenerated;
-			if (highestKineticBall.vy > 0) highestKineticBall.vy -= amountGenerated;
-			/*double averageIncrease = amountGenerated/balls.length;
+			double averageAmountGenerated = (actualKineticEnergy - totalKineticEnergy)/balls.length;
 			for (Ball b : balls){
-				if (b.vy > 0) b.vy-= averageIncrease;
-				else if (b.vy < 0) b.vy+= averageIncrease;
-			}*/
+				if (b.vy > 0) b.vy-= averageAmountGenerated;
+				else if (b.vy < 0) b.vy+= averageAmountGenerated;
+			}
 		}
-	}
-	protected static double calculateKineticEnergy(Ball b){
-		return (double) 1/2*(b.radius*b.radius * Math.sqrt(b.vx*b.vx + b.vy * b.vy));
 	}
 
-	private void handleBallsBeingStuck(Ball b){
-		if (b.x - b.radius < 0){
-			b.x = 0 + b.radius;
-		}
-		if (b.y + b.radius > areaHeight){
-			b.y = areaHeight - b.radius;
-		}
-		if (b.x + b.radius > areaWidth){
-			b.x = areaWidth - b.radius;
-		}
-		if (b.y - b.radius < 0){
-			b.y = 0 + b.radius;
-		}
-	}
 
 	private void handleTwoBallsColliding(Ball b, double collisionMargin, double collisionTimer) {
 		for(Ball b2 : balls){
@@ -125,29 +100,13 @@ class Model {
 			// of the right triangle where distance between x coordinates is the first leg
 			// and the distance between y coordinates is the second leg.
 			// the hypotenuse and the sum of radii are both squared in order to not having to take the costly square root...
-			if (b.collisionTimer > collisionTimer * 6){ // collision once every 5 steps
+			if (b.collisionTimer > collisionTimer * 3){ // only register the collision on certain intervals
 				double distanceSquared = Math.pow((b2.x - b.x),2) + Math.pow((b2.y - b.y), 2);
 				if (distanceSquared <= Math.pow(b.radius + b2.radius, 2) + collisionMargin){
-					//adjustOverlap(b, b2);
-					//transferMomentum1D(b, b2);
 					transferMomentum2D(b, b2);
 					b.collisionTimer = 0;
 				}
 			}
-		}
-	}
-
-	protected static void adjustOverlap(Ball b1, Ball b2) {
-		double difX = ((b2.x + b2.radius) - (b1.x - b1.radius));
-		double difY = ((b2.y - b2.radius) - (b1.y + b1.radius));
-
-		if (difX > 0){
-			b1.x = b1.x + difX / 2;
-			b2.x = b2.x - difX / 2;
-		}
-		if (difY > 0){
-			b1.y = b1.y - difY / 2;
-			b2.y = b2.y + difY / 2;
 		}
 	}
 
@@ -193,7 +152,6 @@ class Model {
 		b2.vy = v2_decomposed[1] + u2tangent*cYtangent;
 	}
 
-	// Only for testing
 	protected static void transferMomentum1D(Ball b1, Ball b2) {
 		double m1 = b1.radius;
 		double m2 = b2.radius;
@@ -203,6 +161,25 @@ class Model {
 		b2.vx = (2*m1*u1 + m2*u2 - m1*u2)/(m1 + m2);
 	}
 
+	// HELPER FUNCTIONS
+	protected static double calculateKineticEnergy(Ball b){
+		return (double) 1/2*(b.radius*b.radius * Math.sqrt(b.vx*b.vx + b.vy * b.vy));
+	}
+
+	private void handleBallsBeingStuckOnEdges(Ball b){
+		if (b.x - b.radius < 0){
+			b.x = 0 + b.radius;
+		}
+		if (b.y + b.radius > areaHeight){
+			b.y = areaHeight - b.radius;
+		}
+		if (b.x + b.radius > areaWidth){
+			b.x = areaWidth - b.radius;
+		}
+		if (b.y - b.radius < 0){
+			b.y = 0 + b.radius;
+		}
+	}
 
 	protected static double[] rectToPolar(double x, double y) {
 		double angle = Math.atan2(y,x); // radians
@@ -234,8 +211,6 @@ class Model {
 			this.radius = r;
 			this.color = c;
 		}
-
-
 
 		/**
 		 * Position, speed, and radius of the ball. You may wish to add other attributes.

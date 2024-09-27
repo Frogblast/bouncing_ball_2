@@ -22,25 +22,6 @@ class ModelTest {
         assertEquals(1.118033989, e, EPSILON);
     }
 
-    @Test
-    void testAdjustOverlap_b2right_b1left(){
-        b1 = new Model.Ball(100, 0, 0, 0, 1, Color.BLUE);
-        b2 = new Model.Ball(101, 0, 0, 0, 1, Color.RED);
-
-        adjustOverlap(b1,b2);
-        assertEquals(101.5, b1.x);
-        assertEquals(99.5, b2.x);
-    }
-
-    @Test
-    void testAdjustOverlap_b1right_b2left(){
-        b1 = new Model.Ball(101, 0, 0, 0, 1, Color.BLUE);
-        b2 = new Model.Ball(100, 0, 0, 0, 1, Color.RED);
-
-        adjustOverlap(b1,b2);
-        assertEquals(101.5, b1.x);
-        assertEquals(99.5, b2.x);
-    }
 
 
     @Test
